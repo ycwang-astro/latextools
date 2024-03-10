@@ -7,7 +7,7 @@ Created on Tue Mar  5  2024
 
 # import subprocess
 import os
-from authmanage import Authors
+from latextools.authmanage import Authors
 
 latex_file = r'''
 \documentclass{%s}

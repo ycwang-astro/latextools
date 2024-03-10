@@ -12,8 +12,8 @@ import os
 import sys
 import yaml
 import re
-from .utils import pause_and_warn
-from .authmanage import Authors
+from latextools.utils import pause_and_warn
+from latextools.authmanage import Authors
 
 def authtex(authors=None, style=None, out=None, organize='copy', no_confirm=False, quiet=False):
     if authors is None:

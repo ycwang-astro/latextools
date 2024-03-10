@@ -219,3 +219,6 @@ def main():
         
         with f.open(os.path.basename(args.file), mode='w') as texf:
             texf.write(maintex.encode())
+
+if __name__ == '__main__':
+    main()
