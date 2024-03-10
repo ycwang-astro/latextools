@@ -41,12 +41,12 @@ def test(classfile, authorfile, authortemplate, mainfile=None):
     os.chdir('..')
     return r
     
-r = test('sn-jnl', '../authors-template.yaml', '../styles/sn-jnl.yaml')
+r = test('sn-jnl', '../templates/authors-template.yaml', 'sn-jnl')
 
-r = test('aastex631', '../authors-template.yaml', '../styles/aastex.yaml', mainfile='aastex631.tex')
+r = test('aastex631', '../templates/authors-template.yaml', 'aastex', mainfile='aastex631.tex')
 
-r = test('mnras', '../authors-template.yaml', '../styles/mnras.yaml', mainfile='mnras.tex')
+r = test('mnras', '../templates/authors-template.yaml', 'mnras', mainfile='mnras.tex')
 
-r = test('aa', '../authors-template.yaml', '../styles/aa.yaml',)
+r = test('aa', '../templates/authors-template.yaml', 'aa')
 
-r = test('raa', '../authors-template.yaml', '../styles/raa.yaml',)
+r = test('raa', '../templates/authors-template.yaml', 'raa')

@@ -3,7 +3,7 @@ args: # these arguments are passed to authtex unless overwritten by the correspo
 
 authors:
 - name: A Author
-  # Some templates offers more detailed name specifications.
+  # Some templates offer more detailed name specifications.
   # In these cases, you may want to fill in the below information.
   name.givenName: A
   name.surnamePrefix: # you may omit fields that are left blank (i.e. deleting this line is ok)

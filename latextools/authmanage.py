@@ -81,8 +81,12 @@ class Authors:
         names = {key: val for key, val in locals().items() if key in name_types}
         if name and not any(names.values()):
             # parse names and update 
-            parsed_names = self.__class__.parse_names(name)
-            names.update(parsed_names)
+            try:
+                parsed_names = self.__class__.parse_names(name)
+            except ValueError:
+                pass
+            else:
+                names.update(parsed_names)
         # if not name and any((givenName, surnamePrefix, surname, suffix)):
         #     name = f'{givenName} {surnamePrefix} {surname} {suffix}'
         name = ' '.join([n for n in names.values() if n])
