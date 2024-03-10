@@ -1,0 +1,32 @@
+# style file for raa.cls
+# for the official LaTeX templates, see https://www.raa-journal.org/sub/macro/
+author: | 
+    &IF &EVAL order == 1 &ENDEVAL : 
+        \author{ 
+    | 
+        \and 
+    &ENDIF 
+    &(name) 
+    \inst{
+    &EVAL ', '.join([str(n) for n in affil_number]) &ENDEVAL
+    }
+
+closing: |
+    }
+
+affiliation: |
+    &IF &EVAL number == 1  &ENDEVAL : 
+        \institute{ 
+    | 
+        \and 
+    &ENDIF 
+    &(affil)
+    &INS( &(affil_emails) )
+
+format: 
+    - authors:
+        - author
+    - closing
+    - affiliation:
+        - affiliation
+    - closing

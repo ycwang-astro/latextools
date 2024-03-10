@@ -1,0 +1,44 @@
+# style file for sn-jnl.cls 
+# for the official LaTeX templates, see https://www.springernature.com/gp/authors/campaigns/latex-author-support#c17590862
+
+# \fnm \spfx \sur \sfx
+author: |
+    &IF &(corresponding) : \author* | \author &ENDIF
+    &INS( &(affil_number) )
+    {
+    &INS( \fnm{&(name.givenName)} ) 
+    &INS( \spfx{&(name.surnamePrefix)} ) 
+    &INS( \sur{&(name.surname)} )
+    &INS( \sfx{&(name.suffix)} )
+    }
+    &INS( \email{&(email)} )
+    &IF &(equalContribution) : \equalcont{These authors contributed equally to this work.} | &ENDIF
+
+
+affiliation: |
+    \affil[
+    &(number)
+    ]{
+    &IF &(affil.organization) : 
+        &INS( \orgdiv{&(affil.division)}, ) 
+        &INS( \orgname{&(affil.organization)},  ) 
+        \orgaddress{
+        &INS( \street{&(affil.street)}, ) 
+        &INS( \city{&(affil.city)} ) 
+        &INS( \postcode{&(affil.postcode)}, ) 
+        &INS( \state{&(affil.state)}, ) 
+        &INS( \country{&(affil.country)} )
+        }
+    |
+        &(affil)
+    &ENDIF
+    }
+    
+format: 
+    authors: 
+        - author
+        - newline
+    affiliations:
+        - affiliation
+        
+    

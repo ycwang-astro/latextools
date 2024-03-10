@@ -1,0 +1,36 @@
+# style file for mnras.cls
+# for the official LaTeX templates, see https://academic.oup.com/mnras/pages/general_instructions#2.1%20LaTeX
+# see also https://www.ctan.org/tex-archive/macros/latex/contrib/mnras
+
+author: | 
+    &(name),
+    $^{
+    &INS( &(affil_number) )
+    }$
+    &IF &(corresponding) : 
+        \thanks{E-mail: 
+        &INS( &(email) )
+        &INS( &(name.abbrev) )
+        }
+    |
+    &ENDIF
+
+affiliation: |
+    \\ $^{
+    &(number)
+    }$
+    &(affil)
+
+prefix: |
+    \author{
+
+suffix: |
+    }
+
+format: 
+    - prefix
+    - authors:
+        author
+    - affiliations:
+        affiliation
+    - suffix

@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "latextools"
+dynamic = ["version"]
+dependencies = [
+    "PyYAML",
+]
+authors = [
+    {name="Yu-Chen Wang"},
+]
+description = "tools for LaTeX"
+readme = "README.md"
+
+[project.optional-dependencies]
+
+[project.scripts]
+authtex = "latextools:run_authtex"
+latexport = "latextools:run_latexport"
+
+[project.urls]
+
+[tool.setuptools]
+packages = ["latextools"]
+
+[tool.setuptools.package-data]
+latextools = ["styles/*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "latextools.__version__"}

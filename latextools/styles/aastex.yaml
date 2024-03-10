@@ -1,0 +1,22 @@
+# style file for aastex631.cls (may work for earlier versions for aastex)
+# for the official LaTeX templates, see https://journals.aas.org/aastex-package-for-manuscript-preparation/#_download
+
+author: |
+    \author
+    &INS( [&(orcid)] )
+    {
+    &(name)
+    }
+    &IF &(equalContribution) : \altaffiliation{These authors contributed equally to this work.} | &ENDIF
+    
+affiliation: |
+    \affiliation{
+    &(affil)
+    &INS( &(affil_emails) )
+    }
+
+format: 
+    authors: 
+        - author
+        - affiliation
+        - newline

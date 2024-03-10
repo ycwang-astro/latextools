@@ -1,0 +1,65 @@
+args: # these arguments are passed to authtex unless overwritten by the corresponding arguments passed in the terminal
+   # --style path/to/style_file --out path/to/output\ tex\ file # use "\ " like this if file path contains space " "
+
+authors:
+- name: A Author
+  # Some templates offers more detailed name specifications.
+  # In these cases, you may want to fill in the below information.
+  name.givenName: A
+  name.surnamePrefix: # you may omit fields that are left blank (i.e. deleting this line is ok)
+  name.surname: Author
+  name.suffix: 
+  order: 1 # This should be a number that is used to order the authors. It do not have to be integers. 
+  affiliation: [uns, une] # use aliases of affiliations; order matters
+  corresponding: true
+  email: authorA@email.com
+  orcid: 0000-0000-0000-0000
+  equalContribution: false
+  
+- name: B Author
+  name.givenName: B
+  name.surnamePrefix: 
+  name.surname: Author
+  name.suffix: 
+  order: 2
+  affiliation: [uns]
+  corresponding: true
+  email: authorB@email.com
+  orcid: 
+  equalContribution: true
+  
+- name: C Author
+  name.givenName: C
+  name.surnamePrefix: 
+  name.surname: Author
+  name.suffix: 
+  order: 3
+  affiliation: [une]
+  corresponding: false
+  email: authorC@email.com
+  orcid: 
+  equalContribution: true
+
+
+affiliations:
+- alias: uns
+  affil: University of Somewhere
+  # Some templates offers more detailed affiliation specifications.
+  # In these cases, you may want to fill in the below information.
+  affil.division: 
+  affil.organization: 
+  affil.street: 
+  affil.city: 
+  affil.postcode: 
+  affil.state: 
+  affil.country: 
+
+- alias: une
+  affil: University of Elsewhere
+  affil.division: 
+  affil.organization: 
+  affil.street: 
+  affil.city: 
+  affil.postcode: 
+  affil.state: 
+  affil.country: 
