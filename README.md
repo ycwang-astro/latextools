@@ -12,6 +12,8 @@ If you use Python and pip:
 pip install git+https://github.com/ycwang-astro/latextools.git
 ```
 
+For Windows users that do not use Python: you may download the executables in the [release page](https://github.com/ycwang-astro/latextools/releases/latest), and use `latexport.exe` or `authtex.exe` in your terminal.
+
 ## Documentation
 
 This package consists of 2 tools:
