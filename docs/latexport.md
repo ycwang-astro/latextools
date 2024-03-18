@@ -14,13 +14,13 @@ Sometimes you may write different sections of your document in separate `.tex` f
 If you find errors or have suggestions, you can create an issue. You are also welcome to modify the script and contribute by creating a pull request.
 
 ### Example Usage
-This is an example of how the script can be used, although there are other ways to use it. To show the help message, run the script by:
+To show the help message, run the script by:
 ```
 latexport -h
 ```
 
-- Copy the `latexport.py` file to the directory where your main `.tex` file is located.
-- Open your terminal and go to the directory.
+Here is an example of how the script can be used, although there are other ways to use it:
+- Open your terminal and go to the directory where your main `.tex` file is located.
 - Run the script by:
 ```
 latexport
