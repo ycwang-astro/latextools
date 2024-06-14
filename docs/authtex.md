@@ -39,7 +39,7 @@ and for `sn-jnl.cls`:
 ```
 It is clear that the formats for different journals are significantly different. Switching between different formats can be tedious and time-consuming, which is why `authtex` was developed.
 
-With `authtex`, one only needs to maintain an author list like this (see [authors-template](templates/authors-template.yaml) for a full template with explanations):
+With `authtex`, one only needs to maintain an author list like this (see [authors-template](../templates/authors-template.yaml) for a full template with explanations):
 ```yaml
 authors:
 - name: A Author
@@ -81,7 +81,7 @@ Using a file like the one above, `authtex` generates the LaTeX code for you. In 
 Since `authtex` uses a unified format to store author and affiliation information, one may maintain a library of this information for easy reuse in future manuscripts.
 
 ### Quick start
-To start using `authtex`, first create an author file (e.g., `authors.yaml`) containing information about the authors and the affiliations. The simplest way to do this is by modifying the template provided [here](templates/authors-template.yaml). Guidelines are included in the template file.
+To start using `authtex`, first create an author file (e.g., `authors.yaml`) containing information about the authors and the affiliations. The simplest way to do this is by modifying the template provided [here](../templates/authors-template.yaml). Guidelines are included in the template file.
 
 Then, you can generate LaTeX code to a .tex file (e.g., `authors.tex`) with the desired format. For example, to generate code for AASTeX, execute the following command in your terminal:
 ```
@@ -124,7 +124,7 @@ You are encouraged to contribute by adding your style file and creating a [pull 
 
 
 ### Style files
-A style file is a YAML file that should include at least 3 keys: `author`, `affiliation` and `format`. You may get an idea of the sturcture by reading the built-in style files [here](latextools/styles).
+A style file is a YAML file that should include at least 3 keys: `author`, `affiliation` and `format`. You may get an idea of the sturcture by reading the built-in style files [here](../latextools/styles).
 
 #### `format`
 
