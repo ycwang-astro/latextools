@@ -9,7 +9,7 @@ Sometimes you may write different sections of your document in separate `.tex` f
 - Exports a zip file (with the file extension `.merged.zip`) that contains the minimum working set of LaTeX files, with no subdirectories.
 - Includes images that are referenced by `\includegraphics`, as well as any necessary `.cls`, `.bst`, `.bib`, and `.bbl` files in the zip file. Additionally, `latexport` updates the paths referring to these files in the main `.tex` file so that it can be compiled successfully.
 
-**Important!** Please note that `latexport` is far from sophisticated. Many types of dependent files are not yet considered, and I have not done a thorough test considering any possible situations. Thus, this may not work perfectly for your case.  
+**Important Note**: Please be aware that `latexport` is still under development and may not handle all types of dependencies or situations perfectly at this stage. **It is recommended to compile the .tex file included in the zip archive exported by `latexport` and thoroughly review the results before distributing it.**
 
 If you find errors or have suggestions, you can create an issue. You are also welcome to modify the script and contribute by creating a pull request.
 
