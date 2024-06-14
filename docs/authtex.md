@@ -167,7 +167,7 @@ format:
 #### Syntax for strings
 As mentioned earlier, you can define strings with names in the style file. The strings support several syntax patterns, as shown below.
 
-- **Variable expansions**: `&(varname)` retrieves the value of the variable named `varname` from the namespace. Supported variables in the namespace are detailed [here](#author-and-affiliation).
+- **Variable expansions**: `&(varname)` retrieves the value of the variable named `varname` from the namespace. Supported variables in the namespace are detailed [here](#`author`-and-`affiliation`-namespaces).
 - **Evaluation**: `&EVAL <expr> &ENDEVAL` evaluates an expression `<expr>`, where variables from the namespace can be included. This is often used within an if-else statement.
 - **Insertion**: `&INS(varname)` adds the value of `varname` to the output string if `bool(varname) is True` (similar to `&(varname)`); otherwise, it adds nothing to the output string. For example, if the value of `varname` is `''` or `None`, `&INS(varname)` adds nothing to the string.
 - **if-else statement**: `&IF <condition> : <true string> | <false string> &ENDIF` conditionally adds `<true string>` if `<condition>` is True; otherwise, it adds `<false string>`. For example:
