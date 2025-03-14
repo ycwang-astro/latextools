@@ -1,0 +1,29 @@
+# style file for aastex7.cls
+# for the official LaTeX templates, see https://journals.aas.org/aastex-package-for-manuscript-preparation/#_download
+
+author: |
+    \author[
+        &INS( gname=&(name.givenName), )
+        &INS( sname=&(name.surname), )
+        &INS( suffix=&(name.suffix), )
+        &INS( &(orcid) )
+    ]{
+        &(name)
+    }
+    &N
+    \email{
+        &INS( &(email) )
+    } 
+    &IF &(equalContribution) : &N \altaffiliation{These authors contributed equally to this work.} | &ENDIF
+    
+affiliation: |
+    \affiliation{
+    &(affil)
+    &INS( &(affil_emails) )
+    }
+
+format: 
+    authors: 
+        - author
+        - affiliation
+        - newline

@@ -293,8 +293,10 @@ class Authors:
                 return false
             else:
                 return true
-        
         s = re.sub(if_pattern, if_sub, s)
+        
+        newline_pattern = '&N'
+        s = re.sub(newline_pattern, r'\n', s)            
    
         return s
     
