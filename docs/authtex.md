@@ -109,10 +109,10 @@ After generating `authors.tex`, you can include the LaTeX code in your main .tex
 
 The built-in styles currently included in `authtex` are:
 - `aa`. Used for [A&A](https://www.aanda.org/for-authors).
-- `aastex`. Used for [AAS journals](https://journals.aas.org/aastex-package-for-manuscript-preparation/#_download)
+- `aastex6` and `aastex7`. Used for [AAS journals](https://journals.aas.org/aastex-package-for-manuscript-preparation/#_download).
 - `mnras`. Used for [MNRAS](https://academic.oup.com/mnras/pages/general_instructions#2.1%20LaTeX).
 - `raa`. Used for [RAA journal](https://www.raa-journal.org/sub/macro/).
-- `sn-jnl`. A LaTeX class provided by [Springer Nature](https://www.springernature.com/gp/authors/campaigns/latex-author-support#c17590862)
+- `sn-jnl`. A LaTeX class provided by [Springer Nature](https://www.springernature.com/gp/authors/campaigns/latex-author-support#c17590862).
 
 If the style you need is not included, you may:
 - Request for addition [here](https://github.com/ycwang-astro/latextools/issues).
