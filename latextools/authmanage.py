@@ -78,7 +78,6 @@ class Authors:
         }
     
     affil_template = {
-        'number': None,
         'alias': None,
         'affil': None,
         'affil.division': None,
@@ -91,6 +90,7 @@ class Authors:
         'postcode_before_city': False,
 
         # below are used when generating latex code, but should not be included in authors.yaml
+        'number': None,
         'affil_emails': None,
         }
     
@@ -178,7 +178,7 @@ class Authors:
         self.authaff['affiliations'].append(affiliation)
       
     def get_affil(self, affil_keys):
-        # get affil given a list of number or alias
+        # get affil given a list of alias
         if len(affil_keys) != len(set(affil_keys)):
             raise DuplicationError(f"duplication found for '{affil_keys}'")
             
@@ -187,8 +187,6 @@ class Authors:
         for affiliation in self.affiliations:
             if affiliation['alias'] in affil_keys:
                 affiliations[affil_keys.index(affiliation['alias'])] = affiliation
-            elif affiliation['number'] in affil_keys:
-                affiliations[affil_keys.index(affiliation['number'])] = affiliation
         
         if None in affiliations:
             raise AffilNotFoundError('affiliation not found: ' + affil_keys[affiliations.index(None)])
@@ -210,14 +208,26 @@ class Authors:
         return renumber_map
     
     def organize(self, autonumber=True, sort=True):
-        ## authors
+        ## reset numbers for authors
         self.__class__._autonumber(self.authors, 'order')
-        renumber_map = self.__class__._autonumber(self.affiliations, 'number')
+        
+        ## set affiliation numbers and trim unused entries
+        author_affiliations = [] # lists of affiliations for each author
+        used_affiliations = [] # a list of affiliations used by authors
+        for author in self.authors:
+            affiliations = self.get_affil(author['affiliation'])
+            author_affiliations.append(affiliations)
+            for affiliation in affiliations:
+                if affiliation not in used_affiliations:
+                    used_affiliations.append(affiliation)
+        for i, affiliation in enumerate(used_affiliations, start=1):
+            affiliation['number'] = i
+        self.authaff['affiliations'] = used_affiliations
+        
         for affiliation in self.affiliations:
             affiliation['affil_emails'] = ''
-        for author in self.authors:
-            author['affiliation'] = [renumber_map[a] if a in renumber_map else a for a in author['affiliation']]
-            affiliations = self.get_affil(author['affiliation'])
+        
+        for author, affiliations in zip(self.authors, author_affiliations):
             author['affil_number'] = [a['number'] for a in affiliations]
             if author['corresponding'] and author['email']:
                 affiliations[0]['affil_emails'] += r'; \mailto{' + author['email'] + '}'
@@ -242,10 +252,6 @@ class Authors:
                 name = ' '.join(n for n in (author.get('name.givenName'), author.get('name.surname')) if n)
             known_names.append(name)
             
-            # skip order=None
-            if author['order'] is None:
-                continue
-            
             if author_list:
                 if name not in author_list:
                     continue
@@ -256,15 +262,19 @@ class Authors:
             if author_set and name not in author_set:
                 continue
             
+            # skip order=None
+            if author['order'] is None:
+                continue
+            
             newobj.add_author(**author)
         
         if author_list:
             for name in author_list:
-                if name not in known_names:
+                if name and name not in known_names:
                     raise ValueError(f'name "{name}" not found')
         if author_set:
             for name in author_set:
-                if name not in known_names:
+                if name and name not in known_names:
                     raise ValueError(f'name "{name}" not found')
         
         for affiliation in authaff['affiliations']:

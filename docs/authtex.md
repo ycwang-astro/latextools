@@ -220,7 +220,6 @@ author_template = { # author
     }
 
 affil_template = { # affiliation
-    'number': None,
     'alias': None,
     'affil': None,
     'affil.division': None,
@@ -233,6 +232,7 @@ affil_template = { # affiliation
     'postcode_before_city': False,
 
     # below are used when generating latex code, but should not be included in authors.yaml
+    'number': None,
     'affil_emails': None,
     }
 ```
