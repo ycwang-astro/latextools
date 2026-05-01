@@ -43,7 +43,9 @@ def test(classfile, authorfile, authortemplate, mainfile=None):
     
 r = test('sn-jnl', '../templates/authors-template.yaml', 'sn-jnl')
 
-r = test('aastex631', '../templates/authors-template.yaml', 'aastex', mainfile='aastex631.tex')
+r = test('aastex631', '../templates/authors-template.yaml', 'aastex6', mainfile='aastex631.tex')
+
+r = test('aastex7', '../templates/authors-template.yaml', 'aastex7', mainfile='aastex7.tex')
 
 r = test('mnras', '../templates/authors-template.yaml', 'mnras', mainfile='mnras.tex')
 

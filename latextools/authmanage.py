@@ -14,7 +14,8 @@ import yaml
 import re
 import os
 # import pkgutil
-from pkg_resources import resource_filename
+from jinja2 import Environment, StrictUndefined
+from importlib import resources
 
 class AuthorInfoError(Exception):
     pass
@@ -22,6 +23,31 @@ class DuplicationError(ValueError):
     pass
 class AffilNotFoundError(Exception):
     pass
+
+class Namespace():
+    '''
+    A namespace used for `name` and `affil`
+    '''
+    def __init__(self, data, name):
+        self._name = name
+        self._data = data
+    
+    def __getattr__(self, key):
+        try:
+            return self._data[key]
+        except KeyError:
+            raise AttributeError(key)
+    
+    def __getitem__(self, key):
+        return self._data[key]
+
+    def __repr__(self):
+        subfields = ', '.join(f'{k}={v}' for k, v in self._data.items())
+        return f'<{self._name}({subfields})>' 
+
+    def __str__(self):
+        return self._name
+
 
 class Authors:
     def __init__(self, s=None, format='yaml'):
@@ -42,11 +68,13 @@ class Authors:
         'name.abbrev': None, 
         'order': None,
         'affiliation': (),
-        'affil_number': (),
         'corresponding': False,
         'email': None,
         'orcid': None,
         'equalContribution': False,
+
+        # below are used when generating latex code, but should not be included in authors.yaml
+        'affil_number': (),
         }
     
     affil_template = {
@@ -60,46 +88,54 @@ class Authors:
         'affil.postcode': None,
         'affil.state': None,
         'affil.country': None,
-        
-        # for use when generating latex code:
+        'postcode_before_city': False,
+
+        # below are used when generating latex code, but should not be included in authors.yaml
         'affil_emails': None,
         }
+    
+    jinja_env = Environment(
+        block_start_string='((*',
+        block_end_string='*))',
+
+        variable_start_string='[[',
+        variable_end_string=']]',
+
+        comment_start_string='((=',
+        comment_end_string='=))',
+
+        undefined=StrictUndefined,
+        autoescape=False,
+        trim_blocks=False,
+        lstrip_blocks=False,
+        )
     
     @classmethod
     def parse_args(cls, template):
         pass
     
-    def add_author(self, 
-                   name=None, givenName=None, surnamePrefix=None, surname=None, suffix=None,
-                   order=None,
-                   affiliation: list | tuple | dict = (),
-                   corresponding=False, email=None, orcid=None, equalContribution=False,
-                   ):
-        if isinstance(affiliation, str):
-            affiliation = (affiliation,)
-        name_types = ('givenName', 'surnamePrefix', 'surname', 'suffix')
-        names = {key: val for key, val in locals().items() if key in name_types}
-        if name and not any(names.values()):
+    def add_author(self, author_info: dict = {}, **kwargs):
+        # preprocess author info dict and add to self.authaff
+        # see author_template for supported fields
+        author_info = self.__class__.author_template.copy() | author_info | kwargs
+        if isinstance(author_info['affiliation'], str):
+            author_info['affiliation'] = (author_info['affiliation'],)
+        name_subfields = {key[5:]: val for key, val in author_info.items() if key.startswith('name.')}
+        if author_info['name'] and not any(name_subfields.values()):
             # parse names and update 
             try:
-                parsed_names = self.__class__.parse_names(name)
+                parsed_names = self.__class__.parse_names(author_info['name'])
             except ValueError:
                 pass
             else:
-                names.update(parsed_names)
+                name_subfields.update(parsed_names)
         # if not name and any((givenName, surnamePrefix, surname, suffix)):
         #     name = f'{givenName} {surnamePrefix} {surname} {suffix}'
-        name = ' '.join([n for n in names.values() if n])
+        author_info['name'] = ' '.join([n for n in name_subfields.values() if n])
         
-        # get author dict
-        author = self.__class__.author_template.copy()
-        for key, val in locals().items():
-            if key in author:
-                author[key] = val
-        for key, val in names.items():
-            key = 'name.' + key
-            if key in author:
-                author[key] = val
+        # create the author namespace used in templates
+        author = {key: value for key, value in author_info.items() if '.' not in key}
+        author['name'] = Namespace(name_subfields, author_info['name'])
         
         self.authaff['authors'].append(author)
         
@@ -117,32 +153,27 @@ class Authors:
     def _sort_authors(self, update_order=True):
         pass
         
-    def add_affil(self, 
-                  affil='',
-                  alias=None, number=None,
-                  division='', organization='',
-                  street='',
-                  city='', postcode='',
-                  state='', country='',
-                  ):
-        affil_types = ('division', 'organization', 'street', 'city', 'postcode', 'state', 'country')
-        affils = {key: str(val) if val else val for key, val in locals().items() if key in affil_types}
-        if not affil and any(affils):
-            citypostcode = affils['city'] + ' ' + affils['postcode']
-            affil_components = (division, organization, street, citypostcode, state, country)
-            affil = ', '.join([s for s in affil_components if s])
-        if affil and not any(affils):
+    def add_affil(self, affil_info: dict = {}, **kwargs):
+        # preprocess affil info dict and add to self.authaff
+        # see affil_template for supported fields
+        affil_info = self.__class__.affil_template.copy() | affil_info | kwargs
+
+        affil_subfields = {key[6:]: val for key, val in affil_info.items() if key.startswith('affil.')}        
+
+        if not affil_info['affil'] and any(affil_subfields):
+            if affil_info['postcode_before_city']:
+                affil_subfields['citystatepostcode'] = (affil_subfields['postcode'] + ' ' if affil_subfields['postcode'] else '') + affil_subfields['city'] + (f', {affil_subfields["state"]}' if affil_subfields['state'] else '')
+            else:
+                affil_subfields['citystatepostcode'] = affil_subfields['city'] + (f', {affil_subfields["state"]}' if affil_subfields['state'] else '') + (' ' + affil_subfields['postcode'] if affil_subfields['postcode'] else '')
+            affil_components = ('division', 'organization', 'street', 'citystatepostcode', 'country')
+            affil_info['affil'] = ', '.join([affil_subfields[s] for s in affil_components if s if affil_subfields[s]])
+        if affil_info['affil'] and not any(affil_subfields):
             # not implemented: auto detect address
             pass
             
-        affiliation = self.__class__.affil_template.copy()
-        for key, val in locals().items():
-            if key in affiliation:
-                affiliation[key] = val
-        for key, val in affils.items():
-            key = 'affil.' + key
-            if key in affiliation:
-                affiliation[key] = val
+        # create the affiliation namespace used in templates        
+        affiliation = {key: value for key, value in affil_info.items() if '.' not in key}
+        affiliation['affil'] = Namespace(affil_subfields, affil_info['affil'])
         
         self.authaff['affiliations'].append(affiliation)
       
@@ -167,9 +198,9 @@ class Authors:
     @staticmethod
     def _autonumber(l, key):
         # sort list of dict, l, by the value of dict key `key`, and re-number them to 1, 2, 3, etc. 
-        # None values are sorted to the end.
         l.sort(
-            key = lambda d: (not d[key], d[key])
+            key = lambda d: (d[key] is None, d[key]) # None values are sorted to the end.
+            # key = lambda d: d[key]
             )
         renumber_map = {}
         for i, d in enumerate(l, start=1):
@@ -199,14 +230,45 @@ class Authors:
         else:
             raise NotImplementedError()
         newobj = cls()
+        
+        author_list = re.split(r',\s*', authaff.get('author_list')) if authaff.get('author_list') else None
+        author_set = re.split(r',\s*', authaff.get('author_set')) if authaff.get('author_set') else None
+        
+        known_names = []
+        
         for author in authaff['authors']:
-            keys = [k[5:] if k.startswith('name.') else k for k in author.keys()]
-            author_kwargs = dict(zip(keys, author.values()))
-            newobj.add_author(**author_kwargs)
+            name = author.get('name')
+            if not name:
+                name = ' '.join(n for n in (author.get('name.givenName'), author.get('name.surname')) if n)
+            known_names.append(name)
+            
+            # skip order=None
+            if author['order'] is None:
+                continue
+            
+            if author_list:
+                if name not in author_list:
+                    continue
+                else:
+                    # overwrites order
+                    author['order'] = author_list.index(name)
+            
+            if author_set and name not in author_set:
+                continue
+            
+            newobj.add_author(**author)
+        
+        if author_list:
+            for name in author_list:
+                if name not in known_names:
+                    raise ValueError(f'name "{name}" not found')
+        if author_set:
+            for name in author_set:
+                if name not in known_names:
+                    raise ValueError(f'name "{name}" not found')
+        
         for affiliation in authaff['affiliations']:
-            keys = [k[6:] if k.startswith('affil.') else k for k in affiliation.keys()]
-            affiliation_kwargs = dict(zip(keys, affiliation.values()))
-            newobj.add_affil(**affiliation_kwargs)
+            newobj.add_affil(**affiliation)
         return newobj
     
     # def load_library(self, people=None, address=None)
@@ -223,10 +285,10 @@ class Authors:
             yaml.add_representer(list, list_representer)
             
             return yaml.dump(self.authaff, sort_keys=False, default_flow_style=False)
-        elif format == 'toml':
-            return toml.dumps(self.authaff)
-        elif format == 'json':
-            return json.dumps(self.authaff, indent=4)
+        # elif format == 'toml':
+        #     return toml.dumps(self.authaff)
+        # elif format == 'json':
+        #     return json.dumps(self.authaff, indent=4)
     
     def save(self, path, format='yaml', overwrite=False, authorlist=None):
         # if authorlist is given, generate according to this
@@ -244,60 +306,44 @@ class Authors:
     def parse_template(self, template, *dicts):
         s = template
         
-        # val &(<...>)
-        val_pattern = r'&\(\s*(?P<key>.*?)\s*\)'
-        def val_sub(match):
-            expr = match.group('key')
-            
-            for d in dicts:
-                if expr in d:
-                    value = d[expr]
-                    break
-            else:
-                raise KeyError(expr)
-            
-            if value:
-                return str(value)
-            else:
-                return '&FALSE'
-        s = re.sub(val_pattern, val_sub, s)
+        # expand ((* INS <content> *))
+        # supresses <content> unless all [[ variable ]] are truthy
+        VAR_PATTERN = re.compile(r'\[\[\s*(.*?)\s*\]\]')
+        INS_PATTERN = re.compile(
+            r'\(\(\*\s*INS\s+(.*?)\s*\*\)\)',
+            re.DOTALL
+            )
         
-        # eval expression &EVAL <expr> %ENDEVAL
-        eval_pattern = r'&EVAL\s*(?P<expr>.*?)\s*&ENDEVAL'
-        def eval_sub(match):
-            expr = match.group('expr')
-            namespace = {}
-            for d in dicts:
-                namespace.update(d)
-            value = eval(expr, namespace)
-            if value:
-                return str(value)
-            else:
-                return '&FALSE'
-        s = re.sub(eval_pattern, eval_sub, s)
+        def repl(match):
+            content = match.group(1)
+    
+            # find all variables inside [[ ... ]]
+            vars_ = VAR_PATTERN.findall(content)
+    
+            # remove duplicates while preserving order
+            seen = set()
+            vars_unique = []
+            for v in vars_:
+                if v not in seen:
+                    seen.add(v)
+                    vars_unique.append(v)
+    
+            if not vars_unique:
+                # no variables → keep content directly
+                return content
+    
+            condition = " and ".join(vars_unique)
+    
+            return f"((* if {condition} *)){content}((* endif *))"
         
-        # ins &INS(<...>)
-        ins_pattern = r'&INS\(\s*(?P<str>.*?)\s*\)'
-        def ins_sub(match):
-            str_ = match.group('str')
-            if '&FALSE' in str_:
-                return ''
-            else:
-                return str_
-        s = re.sub(ins_pattern, ins_sub, s)
-            
-        if_pattern = r'&IF\s*(?P<cond>.*?)\s*:\s*(?P<true>.*?)\s*\|\s*(?P<false>.*?)\s*&ENDIF'
-        def if_sub(match):
-            cond, true, false = match.groups()
-            if '&FALSE' in cond:
-                return false
-            else:
-                return true
-        s = re.sub(if_pattern, if_sub, s)
+        s = INS_PATTERN.sub(repl, s)
         
-        newline_pattern = '&N'
-        s = re.sub(newline_pattern, r'\n', s)            
-   
+        namespace = {}
+        for d in dicts:
+            namespace |= d
+        tmpl = self.__class__.jinja_env.from_string(s)
+        s = tmpl.render(**namespace)
+        
         return s
     
     def load_template(self, path, format='yaml'):
@@ -326,12 +372,12 @@ class Authors:
                 style = style[:-len('.yaml')]
             # stylefile = pkgutil.get_data(__name__, f'styles/{style}.yaml')
             try:
-                stylepath = resource_filename(__name__, f'styles/{style}.yaml')
-                self.template = self.load_template(stylepath)
+                with resources.as_file(resources.files(__package__) / 'styles' / f'{style}.yaml') as stylepath:
+                    self.template = self.load_template(stylepath)
             except FileNotFoundError as e:
                 raise FileNotFoundError(f"cannot find style '{style}'") from e
             
-        tempvars = {} # variables presented in the template file
+        tempvars = {} # variables presented in the template file        
         
         format = self.template['format']
         self.export_str = ''

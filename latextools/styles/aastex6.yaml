@@ -3,16 +3,18 @@
 
 author: |
     \author
-    &INS( [&(orcid)] )
+    ((* INS [ [[orcid]] ] *))
     {
-    &(name)
+    [[name]]
     }
-    &IF &(equalContribution) : \altaffiliation{These authors contributed equally to this work.} | &ENDIF
+    ((* if equalContribution *))
+    \altaffiliation{These authors contributed equally to this work.}
+    ((* endif *))
     
 affiliation: |
     \affiliation{
-    &(affil)
-    &INS( &(affil_emails) )
+    [[affil]]
+    ((* INS [[affil_emails]] *))
     }
 
 format: 

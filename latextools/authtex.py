@@ -64,7 +64,7 @@ def main(argv=None):
         with open(args.authors) as f:
             authors = yaml.load(f, yaml.Loader)
         # re-parse arguments
-        if authors['args']:
+        if authors.get('args'):
             new_argv = split(authors['args']) + sys.argv[1:]
             args = parser.parse_args(new_argv)
             if not args.quiet and authors['args']:

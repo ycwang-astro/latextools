@@ -1,27 +1,29 @@
 # style file for aa.cls
 # for the official documentation, see https://www.aanda.org/for-authors
 author: | 
-    &IF &EVAL order == 1 &ENDEVAL : 
+    ((* if  order == 1 *))
         \author{ 
-    | 
+    ((* else *))
         \and 
-    &ENDIF 
-    &(name) 
+    ((* endif *))
+    [[name]] 
     \inst{
-    &EVAL ', '.join([str(n) for n in affil_number]) &ENDEVAL
-    &IF &(corresponding) : \thanks{\email{&(email)}} | &ENDIF
+    [[ affil_number | join(', ') ]]
+    ((* if corresponding *))
+        \thanks{\email{[[email]]}}
+    ((* endif *))
     }
 
 closing: |
     }
 
 affiliation: |
-    &IF &EVAL number == 1  &ENDEVAL : 
+    ((* if number == 1 *)) 
         \institute{ 
-    | 
+    ((* else *))
         \and 
-    &ENDIF 
-    &(affil)
+    ((* endif *))
+    [[affil]]
     
 #     &INS( &(affil_emails) )
 

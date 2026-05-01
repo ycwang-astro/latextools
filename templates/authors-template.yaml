@@ -1,5 +1,11 @@
-args: # these arguments are passed to authtex unless overwritten by the corresponding arguments passed in the terminal
-   # --style path/to/style_file --out path/to/output\ tex\ file # use "\ " like this if file path contains space " "
+args: # These arguments are passed to authtex unless overwritten by the corresponding arguments passed in the terminal
+  # Example: --style path/to/style_file --out path/to/output\ tex\ file # use "\ " like this if file path contains space " "
+
+author_list: # If provided, only these authors are included, in this exact order. Their 'order' fields will be ignored.
+  # Example: C Author, B Author, A Author # separated by ", "
+
+author_set: # If provided, include only these authors (order does not matter). Their 'order' fields still apply.
+  # Example: A Author, B Author # separated by ", "
 
 authors:
 - name: A Author

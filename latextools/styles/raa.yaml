@@ -1,27 +1,27 @@
 # style file for raa.cls
 # for the official LaTeX templates, see https://www.raa-journal.org/sub/macro/
 author: | 
-    &IF &EVAL order == 1 &ENDEVAL : 
+    ((* if order == 1 *)) 
         \author{ 
-    | 
+    ((* else *))
         \and 
-    &ENDIF 
-    &(name) 
+    ((* endif *))
+    [[name]] 
     \inst{
-    &EVAL ', '.join([str(n) for n in affil_number]) &ENDEVAL
+    [[ affil_number | join(', ') ]]
     }
 
 closing: |
     }
 
 affiliation: |
-    &IF &EVAL number == 1  &ENDEVAL : 
+    ((* if number == 1 *))
         \institute{ 
-    | 
+    ((* else *))
         \and 
-    &ENDIF 
-    &(affil)
-    &INS( &(affil_emails) )
+    ((* endif *))
+    [[affil]]
+    ((* INS [[affil_emails]] *))
 
 format: 
     - authors:

@@ -83,19 +83,19 @@ Since `authtex` uses a unified format to store author and affiliation informatio
 ### Quick start
 To start using `authtex`, first create an author file (e.g., `authors.yaml`) containing information about the authors and the affiliations. The simplest way to do this is by modifying the template provided [here](../templates/authors-template.yaml). Guidelines are included in the template file.
 
-Then, you can generate LaTeX code to a .tex file (e.g., `authors.tex`) with the desired format. For example, to generate code for AASTeX, execute the following command in your terminal:
+Then, you can generate LaTeX code to a .tex file (e.g., `authors.tex`) with the desired format. For example, to generate code for AASTeX7, execute the following command in your terminal:
 ```
-authtex --authors authors.yaml --style aastex --out authors.tex
+authtex --authors authors.yaml --style aastex7 --out authors.tex
 ```
 or more concisely:
 ```
-authtex -a authors.yaml -s aastex -o authors.tex
+authtex -a authors.yaml -s aastex7 -o authors.tex
 ```
 The arguments (except `--authors`) can be added in your author file, e.g.:
 ```yaml
 # this is added to authors.yaml
 args:
-  -s aastex -o authors.tex
+  -s aastex7 -o authors.tex
 ```
 This allows you to further simplify the command:
 ```
@@ -109,13 +109,13 @@ After generating `authors.tex`, you can include the LaTeX code in your main .tex
 
 The built-in styles currently included in `authtex` are:
 - `aa`. Used for [A&A](https://www.aanda.org/for-authors).
-- `aastex6` and `aastex7`. Used for [AAS journals](https://journals.aas.org/aastex-package-for-manuscript-preparation/#_download).
+- `aastex7` and `aastex6`. Used for [AAS journals](https://journals.aas.org/aastex-package-for-manuscript-preparation/#_download).
 - `mnras`. Used for [MNRAS](https://academic.oup.com/mnras/pages/general_instructions#2.1%20LaTeX).
 - `raa`. Used for [RAA journal](https://www.raa-journal.org/sub/macro/).
 - `sn-jnl`. A LaTeX class provided by [Springer Nature](https://www.springernature.com/gp/authors/campaigns/latex-author-support#c17590862).
 
 If the style you need is not included, you may:
-- Request for addition [here](https://github.com/ycwang-astro/latextools/issues).
+- Request for addition by creating an issue [here](https://github.com/ycwang-astro/latextools/issues).
 - Write your own style file (see [Style files](#Style-files)), and pass it to `authtex` like:
 ```
 -s path/to/custom-style.yaml
@@ -124,7 +124,7 @@ You are encouraged to contribute by adding your style file and creating a [pull 
 
 
 ### Style files
-A style file is a YAML file that should include at least 3 keys: `author`, `affiliation` and `format`. You may get an idea of the sturcture by reading the built-in style files [here](../latextools/styles).
+A style file is a YAML file that should include at least 3 keys: `author`, `affiliation` and `format`. You may get an idea of the structure by reading the built-in style files [here](../latextools/styles).
 
 #### `format`
 
@@ -167,29 +167,35 @@ format:
 #### Syntax for strings
 As mentioned earlier, you can define strings with names in the style file. The strings support several syntax patterns, as shown below.
 
-- **Variable expansions**: `&(varname)` retrieves the value of the variable named `varname` from the namespace. Supported variables in the namespace are detailed [here](#author-and-affiliation-namespaces).
-- **Evaluation**: `&EVAL <expr> &ENDEVAL` evaluates an expression `<expr>`, where variables from the namespace can be included. This is often used within an if-else statement.
-- **Insertion**: `&INS(varname)` adds the value of `varname` to the output string if `bool(varname) is True` (similar to `&(varname)`); otherwise, it adds nothing to the output string. For example, if the value of `varname` is `''` or `None`, `&INS(varname)` adds nothing to the string.
-- **if-else statement**: `&IF <condition> : <true string> | <false string> &ENDIF` conditionally adds `<true string>` if `<condition>` is True; otherwise, it adds `<false string>`. For example:
-```
-&IF &EVAL order == 1 &ENDEVAL : 
-    \author{ 
-| 
-    \and 
-&ENDIF 
-```
-This statement behaves as follows:
-```
-if order == 1: # 'order' is a variable
-    # add "\author{ " to the output string
-else:
-    # add "\and " to the output string
+**Delimiters**
+
+| Purpose               | Syntax        |
+| --------------------- | ------------- |
+| Variable / Expression | `[[ ... ]]`   |
+| Logic Block           | `((* ... *))` |
+| Comment               | `((= ... =))` |
+
+**Variables or expressions**. e.g., `[[ name ]]`, `[[ number + 1]]`
+
+**If / Else**. 
+```latex
+((* if condition *))
+string if true
+((* else *))
+string if false
+((* endif *))
 ```
 
-Newlines and leading whitespace at the beginning of each line of the string are always ignored (deleted). Therefore, the above statement is equivalent to:
+**Optional Text**.
+Use `INS` to include text only when the all the variables or expressions are truthy.
+```latex
+((* INS \email{[[email]]} *)) 
 ```
-&IF &EVAL order == 1 &ENDEVAL : \author{ | \and &ENDIF 
-```
+
+Notes:
+- Newlines and leading white-space at the beginning of each line of the string are always ignored (deleted). 
+- You can write LaTeX code as usual.
+
 
 #### `author` and `affiliation` namespaces
 
@@ -204,11 +210,13 @@ author_template = { # author
     'name.abbrev': None, 
     'order': None,
     'affiliation': (),
-    'affil_number': (),
     'corresponding': False,
     'email': None,
     'orcid': None,
     'equalContribution': False,
+
+    # below are used when generating latex code, but should not be included in authors.yaml
+    'affil_number': (),
     }
 
 affil_template = { # affiliation
@@ -222,12 +230,13 @@ affil_template = { # affiliation
     'affil.postcode': None,
     'affil.state': None,
     'affil.country': None,
-    
-    # for use when generating latex code:
+    'postcode_before_city': False,
+
+    # below are used when generating latex code, but should not be included in authors.yaml
     'affil_emails': None,
     }
 ```
-For example, you can retrieve the value of `number` using `&(number)` within the string.
+For example, you can retrieve the value of `number` using `[[number]]` within the string.
 
 Whether you can use variables from the `author` and `affiliation` namespaces depends on where you are using the `author` and `affiliation` names in the format file. This is summarized below:
 ```yaml

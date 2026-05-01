@@ -3,23 +3,22 @@
 # see also https://www.ctan.org/tex-archive/macros/latex/contrib/mnras
 
 author: | 
-    &(name),
+    [[name]],
     $^{
-    &INS( &(affil_number) )
+    ((* INS [[affil_number | join(',')]] *))
     }$
-    &IF &(corresponding) : 
+    ((* if corresponding *))
         \thanks{E-mail: 
-        &INS( &(email) )
-        &INS( &(name.abbrev) )
+        ((* INS [[email]] *))
+        ((* INS [[name.abbrev]] *))
         }
-    |
-    &ENDIF
+    ((* endif *))
 
 affiliation: |
     \\ $^{
-    &(number)
+    [[number]]
     }$
-    &(affil)
+    [[affil]]
 
 prefix: |
     \author{
