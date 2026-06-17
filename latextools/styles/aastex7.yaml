@@ -14,7 +14,11 @@ author: |
     
     [['\n']]
     
-    \email{
+    \email
+    ((* if corresponding *))
+        [show]
+    ((* endif *))
+    {
         ((* INS [[email]] *))
     } 
     
