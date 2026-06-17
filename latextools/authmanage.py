@@ -161,6 +161,8 @@ class Authors:
         affil_subfields = {key[6:]: val for key, val in affil_info.items() if key.startswith('affil.')}        
 
         if not affil_info['affil'] and any(affil_subfields):
+            if isinstance(affil_subfields['postcode'], (int, float)):
+                affil_subfields['postcode'] = str(affil_subfields['postcode'])
             if affil_info['postcode_before_city']:
                 affil_subfields['citystatepostcode'] = (affil_subfields['postcode'] + ' ' if affil_subfields['postcode'] else '') + affil_subfields['city'] + (f', {affil_subfields["state"]}' if affil_subfields['state'] else '')
             else:
